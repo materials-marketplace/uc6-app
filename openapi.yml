@@ -1,0 +1,390 @@
+---
+openapi: 3.0.0
+
+info:
+    title: UC6 MarketPlace app
+    description: MarketPlace app for the MatCalc software
+    version: 1.0.0
+    x-api-version: 0.6.0
+    x-products:
+        - name: Monthly
+          productId:
+servers:
+    - url: https://uc6.materials-data.space
+
+paths:
+    /health:
+        get:
+            summary: Check if application is running.
+            description: Checks if the application is running and available
+            operationId: heartbeat_health_get
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema: {}
+    /transformations:
+        get:
+            summary: Get all simulations.
+            description: |-
+                Fetch all simulations
+
+                Returns:
+                    TransformationListResponse: List of simulations.
+            operationId: getTransformationList
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TransformationListResponse'
+        post:
+            summary: Create a new transformation
+            description: Create a new transformation.
+            operationId: newTransformation
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TransformationInput'
+                required: true
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TransformationCreateResponse'
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+    /transformations/{transformation_id}:
+        get:
+            summary: Get a transformation
+            operationId: getTransformation
+            parameters:
+                - required: true
+                  schema:
+                      title: Transformation Id
+                      type: string
+                      format: uuid4
+                  name: transformation_id
+                  in: path
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TransformationModel'
+                '400':
+                    description: Error executing get operation
+                '404':
+                    description: Not Found.
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+        delete:
+            summary: Delete a transformation
+            operationId: deleteTransformation
+            parameters:
+                - required: true
+                  schema:
+                      title: Transformation Id
+                      type: string
+                      format: uuid4
+                  name: transformation_id
+                  in: path
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema: {}
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+        patch:
+            summary: Update the state of the simulation.
+            description: |-
+                Update an existing simulation.
+
+                Args:
+                    transformation_id (TransformationId): ID of the transformation to be updated.
+                    payload (TransformationUpdateModel): State to which transformation is to be updated to.
+
+                Returns:
+                    TransformationUpdateResponse: Returns ID and updated state of the transformation.
+            operationId: updateTransformation
+            parameters:
+                - required: true
+                  schema:
+                      title: Transformation Id
+                      type: string
+                      format: uuid4
+                  name: transformation_id
+                  in: path
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TransformationUpdateModel'
+                required: true
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TransformationUpdateResponse'
+                '400':
+                    description: Error executing update operation
+                '404':
+                    description: Not Found.
+                '409':
+                    description: Requested state not available
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+    /transformations/{transformation_id}/state:
+        get:
+            summary: Get the state of the simulation.
+            description: |-
+                Get the state of a simulation.
+
+                Args:
+                    transformation_id (TransformationId): ID of the simulation
+
+                Returns:
+                    TransformationStateResponse: The state of the simulation.
+            operationId: getTransformationState
+            parameters:
+                - required: true
+                  schema:
+                      title: Transformation Id
+                      type: string
+                      format: uuid4
+                  name: transformation_id
+                  in: path
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TransformationStateResponse'
+                '404':
+                    description: Unknown simulation
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+    /results:
+        get:
+            summary: Get a simulation's result
+            operationId: getDataset
+            parameters:
+                - required: true
+                  schema:
+                      title: Collection Name
+                      maxLength: 255
+                      minLength: 1
+                      type: string
+                  name: collection_name
+                  in: query
+                - required: true
+                  schema:
+                      title: Dataset Name
+                      minLength: 1
+                      type: string
+                  name: dataset_name
+                  in: query
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema: {}
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+components:
+    schemas:
+        AllowedElements:
+            title: AllowedElements
+            enum:
+                - Fe
+                - C
+                - Cr
+                - Mn
+                - Mo
+                - Ni
+                - Si
+            type: string
+            description: An enumeration.
+        Element:
+            title: Element
+            required:
+                - element
+                - weightPercentage
+            type: object
+            properties:
+                element:
+                    $ref: '#/components/schemas/AllowedElements'
+                weightPercentage:
+                    title: Weightpercentage
+                    type: number
+        HTTPValidationError:
+            title: HTTPValidationError
+            type: object
+            properties:
+                detail:
+                    title: Detail
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ValidationError'
+        TransformationCreateResponse:
+            title: TransformationCreateResponse
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    title: Id
+                    type: string
+                    format: uuid4
+        TransformationInput:
+            title: TransformationInput
+            type: object
+            properties:
+                elements:
+                    title: Elements
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Element'
+                    default:
+                        - element: C
+                          weightPercentage: 25
+                        - element: Cr
+                          weightPercentage: 50
+                        - element: Mn
+                          weightPercentage: 25
+        TransformationListResponse:
+            title: TransformationListResponse
+            required:
+                - items
+            type: object
+            properties:
+                items:
+                    title: Items
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/TransformationModel'
+        TransformationModel:
+            title: TransformationModel
+            required:
+                - id
+                - parameters
+            type: object
+            properties:
+                id:
+                    title: Id
+                    type: string
+                    format: uuid4
+                parameters:
+                    title: Parameters
+                    type: object
+                state:
+                    $ref: '#/components/schemas/TransformationState'
+        TransformationState:
+            title: TransformationState
+            enum:
+                - CREATED
+                - RUNNING
+                - STOPPED
+                - COMPLETED
+                - FAILED
+            type: string
+            description: An enumeration.
+        TransformationStateResponse:
+            title: TransformationStateResponse
+            required:
+                - id
+                - state
+            type: object
+            properties:
+                id:
+                    title: Id
+                    type: string
+                    format: uuid4
+                state:
+                    $ref: '#/components/schemas/TransformationState'
+        TransformationUpdateModel:
+            title: TransformationUpdateModel
+            required:
+                - state
+            type: object
+            properties:
+                state:
+                    title: State
+                    enum:
+                        - RUNNING
+                        - STOPPED
+                    type: string
+        TransformationUpdateResponse:
+            title: TransformationUpdateResponse
+            required:
+                - id
+                - state
+            type: object
+            properties:
+                id:
+                    title: Id
+                    type: string
+                    format: uuid4
+                state:
+                    title: State
+                    enum:
+                        - RUNNING
+                        - STOPPED
+                    type: string
+        ValidationError:
+            title: ValidationError
+            required:
+                - loc
+                - msg
+                - type
+            type: object
+            properties:
+                loc:
+                    title: Location
+                    type: array
+                    items:
+                        anyOf:
+                            - type: string
+                            - type: integer
+                msg:
+                    title: Message
+                    type: string
+                type:
+                    title: Error Type
+                    type: string

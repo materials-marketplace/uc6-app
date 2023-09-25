@@ -1,0 +1,16 @@
+{
+    "elements": [
+        {
+            "element": "Fe",
+            "weightPercentage": 1.0
+        },
+        {
+            "element": "C",
+            "weightPercentage": 1.0
+        },
+        {
+            "element": "Cr/Mn/Mo/Ni/Si",
+            "weightPercentage": 1.0
+        }
+    ]
+}

@@ -1,0 +1,90 @@
+$--------------------------------------------------------------------------------------------------
+
+$ Created by Lukas Kertsch at Fraunhofer IWM
+$ for MarketPlace UC6
+$ Script for the free version of MatCalc 6.03 (rel 1.000)
+$ using the thermodynamc database mc_fe_v2.059.tdb
+$ System Fe-$third-C
+
+$--------------------------------------------------------------------------------------------------
+
+$ ---------- Check MatCalc version
+
+if (matcalc_version<6031000)
+    send-dialog-string "MatCalc version must be 6.03.1000 or higher to run this script."
+    stop-run-script
+endif
+
+$ ---------- Thermodynamic database, elements and phases
+
+use-module module-name=core
+close-workspace options=f
+new-workspace
+open-thermodyn-database mc_fe.tdb
+select-elements elements=Fe $third C
+select-phases phases=LIQUID FCC_A1 BCC_A2 CEMENTITE M23C6 M7C3 M6C LAVES_PHASE
+read-thermodyn-database
+set-reference-element element=Fe
+enter-composition type=weight-percent composition=$third=$c_third C=$c_C
+
+$ ---------- Initial equilibrium
+
+set-temperature-celsius temperature=1600
+set-start-values
+calculate-equilibrium
+
+$ ---------- Evaluate equilibrium at a series of temperatures
+
+set-step-option type=temperature
+set-step-option range start=1550 stop=400 scale=lin step-width=1
+set-step-option temperature-in-celsius=yes
+step-equilibrium
+
+$ ---------- Export results
+
+export-open-file file-name = T_C.dat
+export-clear-file
+export-file-buffer format-string = %.6e variable-name = T$C
+export-close-file
+
+export-open-file file-name = f_LIQUID.dat
+export-clear-file
+export-file-buffer format-string = %.6e variable-name = f$LIQUID
+export-close-file
+
+export-open-file file-name = f_FCC_A1.dat
+export-clear-file
+export-file-buffer format-string = %.6e variable-name = f$FCC_A1
+export-close-file
+
+export-open-file file-name = f_BCC_A2.dat
+export-clear-file
+export-file-buffer format-string = %.6e variable-name = f$BCC_A2
+export-close-file
+
+export-open-file file-name = f_CEMENTITE.dat
+export-clear-file
+export-file-buffer format-string = %.6e variable-name = f$CEMENTITE
+export-close-file
+
+export-open-file file-name = f_M23C6.dat
+export-clear-file
+export-file-buffer format-string = %.6e variable-name = f$M23C6
+export-close-file
+
+export-open-file file-name = f_M7C3.dat
+export-clear-file
+export-file-buffer format-string = %.6e variable-name = f$M7C3
+export-close-file
+
+export-open-file file-name = f_M6C.dat
+export-clear-file
+export-file-buffer format-string = %.6e variable-name = f$M6C
+export-close-file
+
+export-open-file file-name = f_LAVES_PHASE.dat
+export-clear-file
+export-file-buffer format-string = %.6e variable-name = f$LAVES_PHASE
+export-close-file
+
+exit
