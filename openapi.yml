@@ -232,7 +232,6 @@ components:
         AllowedElements:
             title: AllowedElements
             enum:
-                - Fe
                 - C
                 - Cr
                 - Mn
@@ -283,11 +282,9 @@ components:
                         $ref: '#/components/schemas/Element'
                     default:
                         - element: C
-                          weightPercentage: 25
+                          weightPercentage: 0.5
                         - element: Cr
-                          weightPercentage: 50
-                        - element: Mn
-                          weightPercentage: 25
+                          weightPercentage: 5
         TransformationListResponse:
             title: TransformationListResponse
             required:

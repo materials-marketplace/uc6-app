@@ -47,9 +47,9 @@ class MatCalcProcess(Process):
         ]
         self.output_path = output_path
         self.substitutes = {
-            "third": self.elements[2].element.value,
-            "c_third": self.elements[2].weightPercentage,
-            "c_C": self.elements[1].weightPercentage,
+            "third": self.elements[1].element.value,
+            "c_third": self.elements[1].weightPercentage,
+            "c_C": self.elements[0].weightPercentage,
         }
 
     def run(self):
