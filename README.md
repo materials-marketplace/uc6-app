@@ -1,6 +1,6 @@
 # MarketPlace UC6 app
 
-Contact: [Pablo de Andres](mailto:pablo.de.andres@iwm.fraunhofer.de)
+Contact: [Yoav Nahshon](mailto:yoav.nahshon@iwm.fraunhofer.de), [Pablo de Andres](mailto:pablo.de.andres@iwm.fraunhofer.de)
 
 ## Overview
 
